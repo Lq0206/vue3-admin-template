@@ -1,2 +1,24 @@
-# vue3-admin-template
-基于Vue-cli4.0 + Vue3.0搭建的后台开发框架
+# vue-js-template
+
+## Project setup
+```
+yarn install
+```
+
+### Compiles and hot-reloads for development
+```
+yarn serve
+```
+
+### Compiles and minifies for production
+```
+yarn build
+```
+
+### Lints and fixes files
+```
+yarn lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
