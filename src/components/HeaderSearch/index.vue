@@ -46,16 +46,11 @@ export default {
       options: [],
       searchPool: [],
       show: false,
-      fuse: undefined,
-      routes: computed(() => store.getters.permission_routes)
+      fuse: undefined
     })
-    return { ...toRefs(state) }
+    const routes = computed(() => store.getters.permission_routes)
+    return { ...toRefs(state), routes }
   },
-  // computed: {
-  //   routes() {
-  //     return this.$store.getters.permission_routes
-  //   }
-  // },
   watch: {
     routes() {
       this.searchPool = this.generateRoutes(this.routes)

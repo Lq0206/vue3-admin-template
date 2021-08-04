@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-04-01 09:54:12
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-30 10:04:11
+ * @LastEditTime: 2021-08-04 17:54:05
  */
 import router from './router'
 import store from './store'
@@ -33,8 +33,13 @@ router.beforeEach(async(to, from, next) => {
         try {
           const { roles } = await store.dispatch('GetInfo')
           const accessRoutes = await store.dispatch('generateRoutes', roles)
-          router.addRoute(accessRoutes)
-          next({ ...to, replace: true })
+          /* vue-router 4 不只支持数组添加 */
+          if (accessRoutes.length > 0) {
+            router.addRoute(...accessRoutes)
+            next({ ...to, replace: true })
+          } else {
+            next()
+          }
         } catch (error) {
           await store.dispatch('resetToken')
           ElMessage.error(error || 'Has Error')

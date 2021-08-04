@@ -90,10 +90,12 @@ export default defineComponent({
       })
     }
 
-    return { fixedHeader,
+    return {
+      fixedHeader,
       tagsView,
       sidebarLogo,
-      themeChange }
+      themeChange
+    }
   }
 })
 </script>

@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-30 09:39:21
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-30 15:00:58
+ * @LastEditTime: 2021-08-03 11:42:39
 -->
 <template>
   <div class="page-wrapper">
@@ -12,7 +12,28 @@
       <ProTable
         :tableData="tableData"
         :columns="columns"
-      ></ProTable>
+        :reload="loadData"
+        :columns-config="{
+          align: 'center'
+        }"
+        pagination
+        @search="handleTableSearch"
+      >
+        <template #actions>
+          <el-space>
+            <el-button
+              type="primary"
+              plain
+              icon="el-icon-edit"
+            >编辑</el-button>
+            <el-button
+              type="danger"
+              plain
+              icon="el-icon-delete"
+            >删除</el-button>
+          </el-space>
+        </template>
+      </ProTable>
     </el-card>
   </div>
 </template>
@@ -24,27 +45,32 @@ export default defineComponent({
   components: { ProTable },
   setup() {
     const state = reactive({
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }],
-      columns: [{ prop: 'date', alias: '日期' }, { prop: 'name', alias: '名称' }, { prop: 'address', alias: '地址' }]
+      tableData: [],
+      columns: [{ prop: 'id', width: '100px' }, { prop: 'date', alias: '日期', width: '150px' },
+        { prop: 'name', alias: '名称', width: '150px' }, { prop: 'address', alias: '地址' }]
     })
 
-    return { ...toRefs(state) }
+    const loadData = () => {
+      for (let i = 0; i < 20; i++) {
+        state.tableData.push({
+          id: `id_${i + 1}`,
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        })
+      }
+    }
+    loadData()
+
+    const handleTableSearch = (params) => {
+      console.log(params)
+    }
+
+    return {
+      ...toRefs(state),
+      loadData,
+      handleTableSearch
+    }
   }
 })
 

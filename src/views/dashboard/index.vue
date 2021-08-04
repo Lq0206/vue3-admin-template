@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-04-07 09:51:19
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-30 10:41:18
+ * @LastEditTime: 2021-08-02 09:27:42
 -->
 <template>
   <div class="app-main-wrap">
@@ -194,7 +194,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { defineComponent, onMounted, onUnmounted } from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount } from 'vue'
 import CusCard from '@/components/CusCard'
 import * as echarts from 'echarts'
 export default defineComponent({
@@ -212,8 +212,9 @@ export default defineComponent({
       })
     })
 
-    onUnmounted(() => {
-      window.removeEventListener('resize')
+    onBeforeUnmount(() => {
+      window.removeEventListener('resize', pvuvChart.resize())
+      window.removeEventListener('resize', userChart.resize())
     })
 
     const initUsers = () => {

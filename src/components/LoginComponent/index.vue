@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2020-10-19 15:06:45
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-26 18:05:29
+ * @LastEditTime: 2021-08-03 15:42:28
 -->
 <template>
   <div class="login-form">
@@ -39,7 +39,10 @@
             placeholder="验证码"
           />
           <a class="verify-code">
-            <img src="../../assets/404.png" alt="">
+            <img
+              src="../../assets/404.png"
+              alt=""
+            >
           </a>
         </el-space>
       </el-form-item>

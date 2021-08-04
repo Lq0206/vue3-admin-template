@@ -4,25 +4,25 @@
  * @Author: Lqi
  * @Date: 2021-07-30 10:02:45
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-30 17:35:19
+ * @LastEditTime: 2021-08-03 11:52:44
 -->
 <template>
   <div class="pro-table">
-    <div
-      v-if="searchBar"
-      class="pro-table__search-bar"
-    >searchBar</div>
+    <SearchBar ref="SearchBarRef" @search="searchChange"></SearchBar>
     <div class="pro-table__content">
       <div class="pro-table__header clearfix">
         <h4 class="pro-table__header-title fl">{{ title }}</h4>
         <div class="pro-table__options fr">
           <el-space>
             <slot name="extra"></slot>
-            <a class="ops-item-icon">
+            <a
+              class="ops-item-icon"
+              @click="reLoadData"
+            >
               <i class="el-icon-refresh-right"></i>
             </a>
             <a class="ops-item-icon">
-              <el-dropdown @command="handleSizeChange">
+              <el-dropdown @command="handleTableSizeChange">
                 <span class="el-dropdown-link">
                   <i class="el-icon-c-scale-to-original"></i>
                 </span>
@@ -48,7 +48,7 @@
                   <i class="el-icon-setting"></i>
                 </template>
                 <div class="field-select-layout">
-                  <ul>
+                  <ul v-if="cloneColumns.length > 0">
                     <li class="field-item all-select">
                       <el-checkbox
                         :indeterminate="isIndeterminate"
@@ -63,10 +63,17 @@
                     >
                       <li
                         class="field-item"
-                        v-for="(check, i) in columns"
+                        v-for="(check, i) in cloneColumns"
                         :key="`check_${i}`"
                       >
-                        <el-checkbox :label="check.prop">{{ check.alias }}</el-checkbox>
+                        <el-checkbox :label="check.prop">{{ check.alias || check.prop }}</el-checkbox>
+                        <div class="sort-ops">
+                          <a
+                            title="固定左侧显示"
+                            @click="handleFieldTop(check)"
+                          ><i :class="`el-icon-top ${check.fixed ? 'active' : '' }`"></i></a>
+                          <!-- <a @click="handleFieldTop(check, 'bottom')"><i :class="`el-icon-bottom ${check.fixed && check.fixed === 'right' ? 'active' : '' }`"></i></a> -->
+                        </div>
                       </li>
                     </el-checkbox-group>
                   </ul>
@@ -78,28 +85,86 @@
       </div>
       <div class="pro-table__body">
         <el-table
-          :data="tableData"
+          ref="proTable"
+          v-if="checkList.length > 0"
+          :data="tableDataColumns.slice((page.currentPage-1)*page.pageSize,page.currentPage*page.pageSize)"
           :size="curSize"
+          row-key="id"
           v-loading="tableLoading"
+          border
+          @selection-change="handleSelectionChange"
         >
+          <el-table-column
+            type="selection"
+            width="55"
+          >
+          </el-table-column>
           <template
             v-for="(column, i) in cloneColumns"
             :key="`column_${i}`"
           >
             <el-table-column
               v-if="column.show !== false"
+              :width="column.width"
               :prop="column.prop"
-              :label="column.alias"
+              :fixed="column.fixed"
+              :align="columnsConfig.align"
+              :label="column.alias || column.prop"
             ></el-table-column>
           </template>
+          <el-table-column
+            fixed="right"
+            width="200px"
+            label="操作"
+            :size="curSize"
+          >
+            <div class="pro-table__actions">
+              <slot name="actions">
+              </slot>
+            </div>
+          </el-table-column>
         </el-table>
+        <div
+          v-else
+          class="not-data"
+        >
+          <el-empty :image-size="200"></el-empty>
+        </div>
+        <div class="pro-table__pagination">
+          <el-pagination
+            :hide-on-single-page="cloneColumns.length > 0"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :page-sizes="[5, 10, 20]"
+            :current-page="page.currentPage"
+            :page-size="page.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="tableDataColumns.length"
+          >
+          </el-pagination>
+        </div>
       </div>
+    </div>
+    <div class="multiple-selection-wrapper">
+      <el-space>
+        <slot name="multiple-extra"></slot>
+        <el-button
+          type="danger"
+          icon="el-icon-delete"
+          @click="multipleDelete"
+        >批量删除</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-delete"
+        >批量审批</el-button>
+      </el-space>
     </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-import { defineComponent, toRefs, reactive } from 'vue'
+import { defineComponent, toRefs, reactive, nextTick, ref, provide } from 'vue'
+import SearchBar from './components/searchBar.vue'
 import _ from 'lodash'
 export default defineComponent({
   props: {
@@ -116,74 +181,186 @@ export default defineComponent({
       type: Array,
       default: () => []
     },
+    /* columns config */
+    columnsConfig: {
+      type: Object,
+      default: () => ({
+        align: 'left'
+      })
+    },
     tableData: {
       type: Array,
       default: () => []
+    },
+    reload: {
+      type: Function,
+      default: null
+    },
+    pagination: {
+      type: Boolean,
+      default: false
     }
   },
-  setup(props) {
+  components: {
+    SearchBar
+  },
+  setup(props, ctx) {
     const state = reactive({
       tableSize: [{ label: 'medium', value: 'medium' }, { label: 'small', value: 'small' }, { label: 'mini', value: 'mini' }],
       curSize: 'medium',
       checkAll: true,
       isIndeterminate: true,
-      allList: props.columns.map(v => v.prop),
+      originalColumns: props.columns.map(v => v.prop), // 传入的原始columns
       checkList: props.columns.map(v => v.prop) || [], // 字段选择
       cloneColumns: _.cloneDeep(props.columns.map(v => {
         v.show = true
+        v.fixed = false
         return v
       })),
-      tableLoading: false
+      preSize: '',
+      tableDataColumns: _.cloneDeep(props.tableData),
+      tableLoading: false,
+      page: {
+        currentPage: 1,
+        pageSize: 5
+      },
+      multipleSelection: [],
+      isMultiple: false
     })
+    const proTable = ref(null)
+    const SearchBarRef = ref(null)
+    provide('columns', props.columns)
+    provide('searchBar', props.searchBar)
 
-    /* plan A */
-    // const columnList = computed(() => {
-    //   const arr = []
-    //   let nCheckList = state.checkList
-    //   nCheckList = nCheckList.sort((a, b) => {
-    //     return state.allList.indexOf(a) - state.allList.indexOf(b)
-    //   })
-    //   nCheckList.forEach(i => {
-    //     props.columns.forEach(j => {
-    //       if (i === j.prop) arr.push(j)
-    //     })
-    //   })
-    //   return arr
-    // })
+    /* 重载数据 */
+
+    const reLoadData = () => {
+      state.tableLoading = true
+      SearchBarRef.value.loading = true
+      props.reload()
+      setTimeout(() => {
+        state.tableLoading = false
+        SearchBarRef.value.loading = false
+      }, 1000)
+    }
+
+    /* 单项checkBox 改变事件 */
 
     const handleCheckedFieldChange = (params) => {
       state.tableLoading = true
-      state.cloneColumns.forEach(j => {
-        j.show = state.checkList.includes(j.prop)
-      })
+      handleFieldDisplay()
       const checkedCount = params.length
-      state.checkAll = checkedCount === state.allList.length
-      state.isIndeterminate = checkedCount > 0 && checkedCount < state.allList.length
+      state.checkAll = checkedCount === state.originalColumns.length
+      state.isIndeterminate = checkedCount > 0 && checkedCount < state.originalColumns.length
       setTimeout(() => {
         state.tableLoading = false
       }, 200)
     }
+
+    /* 全选改变事件 */
 
     const handleCheckAllChange = (value) => {
       state.tableLoading = true
-      state.checkList = value ? state.allList : []
+      state.checkList = value ? state.originalColumns : []
       state.isIndeterminate = false
+      handleFieldDisplay()
       setTimeout(() => {
         state.tableLoading = false
       }, 200)
     }
 
-    const resetConfig = (params) => {
+    /* 控制字段显示数据 */
+    const handleFieldDisplay = () => {
+      state.cloneColumns.forEach(j => {
+        j.show = state.checkList.includes(j.prop)
+      })
+    }
 
+    /* 重置配置 */
+
+    const resetConfig = () => {
+      state.cloneColumns.map(v => {
+        v.fixed = false
+        return v
+      })
     }
 
     /* table size set */
-    const handleSizeChange = (size) => {
+    const handleTableSizeChange = (size) => {
       state.curSize = size
+
+      nextTick(() => {
+        const els = document.body.querySelectorAll('.pro-table__body .el-button')
+        if (state.preSize) {
+          els.forEach(el => {
+            el.classList.remove(`el-button--${state.preSize}`)
+          })
+        }
+        els.forEach((el, i) => {
+          el.classList.add(`el-button--${size}`)
+        })
+        state.preSize = size
+      })
     }
 
-    return { ...toRefs(state), resetConfig, handleSizeChange, handleCheckedFieldChange, handleCheckAllChange }
-  }
+    /* 调整字段置顶操作 */
+
+    const handleFieldTop = (field) => {
+      state.cloneColumns.map(v => {
+        v.fixed = v.prop === field.prop
+        return v
+      })
+    }
+
+    /* 分页事件 */
+
+    const handleSizeChange = (val) => {
+      state.page.pageSize = val
+      reLoadData()
+    }
+
+    /* 当前页事件 */
+    const handleCurrentChange = (val) => {
+      state.page.currentPage = val
+      reLoadData()
+    }
+
+    /* table 多选 */
+
+    const handleSelectionChange = (selection) => {
+      state.multipleSelection = selection
+      /* vif vshow 绑定多选值存在问题，先用原始方式解决 */
+      document.querySelector('.multiple-selection-wrapper').style.display = selection.length > 0 ? 'block' : 'none'
+    }
+
+    /* 批量删除 */
+    const multipleDelete = () => {
+      const ids = state.multipleSelection.map(item => item.id)
+      console.log('ids', ids.join(','))
+    }
+
+    const searchChange = (params) => {
+      ctx.emit('search', params)
+    }
+
+    return {
+      ...toRefs(state),
+      proTable,
+      SearchBarRef,
+      resetConfig,
+      handleTableSizeChange,
+      handleCheckedFieldChange,
+      handleCheckAllChange,
+      reLoadData,
+      handleFieldTop,
+      handleSizeChange,
+      handleCurrentChange,
+      handleSelectionChange,
+      multipleDelete,
+      searchChange
+    }
+  },
+  emits: ['search']
 })
 
 </script>
@@ -201,11 +378,25 @@ export default defineComponent({
     &__body {
     }
   }
+  .multiple-selection-wrapper {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 20px;
+    text-align: right;
+    background: #fff;
+    box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.08),
+      0 9px 28px 0 rgba(0, 0, 0, 0.05), 0 12px 48px 16px rgba(0, 0, 0, 0.03);
+  }
 }
 
 .field-select-layout {
   .field-item {
     padding: 4px 0;
+    display: flex;
+    justify-content: space-between;
     // cursor: pointer;
     &:hover {
       background: #f5f5f5;
@@ -219,6 +410,25 @@ export default defineComponent({
       a:hover {
         color: $--color-primary;
       }
+    }
+    & .sort-ops {
+      font-size: 14px;
+      display: inline-block;
+      // display: none;
+      a {
+        padding: 0 4px;
+        &:hover {
+          color: $--color-primary;
+        }
+        i.active {
+          font-weight: 600;
+          color: $--color-primary;
+          text-shadow: 0 0 2px $--color-primary;
+        }
+      }
+    }
+    &:hover .sort-ops {
+      display: inline-block;
     }
   }
 }

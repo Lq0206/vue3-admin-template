@@ -84,7 +84,9 @@ export default defineComponent({
 
     const logout = async() => {
       await store.dispatch('LoginOut')
+      await store.dispatch('generateRoutes', ['admin'])
       router.push(`/login`)
+      // window.location.reload()
     }
 
     const setting = async() => {

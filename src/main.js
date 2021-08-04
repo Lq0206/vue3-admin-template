@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-04-01 09:30:48
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-30 11:54:59
+ * @LastEditTime: 2021-08-04 10:35:54
  */
 import 'normalize.css'
 import { createApp } from 'vue'
@@ -20,9 +20,10 @@ import 'element-plus/lib/theme-chalk/display.css'
 import store from './store'
 import 'nprogress/nprogress.css'
 import './permission'
+import './mock/mock'
 const app = createApp(App)
 
-// app.config.globalProperties.$ELEMENT = { size: 'medium', zIndex: 3000 }
+app.config.globalProperties.$ELEMENT = { size: 'medium', zIndex: 3000 }
 // 装载组件（按需加载暂时存在性能问题）
 // components.forEach(component => {
 //   app.component(component.name, component)

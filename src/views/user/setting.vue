@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-23 16:54:03
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-29 14:09:21
+ * @LastEditTime: 2021-08-04 17:55:37
 -->
 <template>
   <div class="app-main-wrap">
@@ -207,7 +207,6 @@ export default defineComponent({
         { title: '备用邮箱', des: '已绑定邮箱：abc***gmail.com', status: 1 }
       ]
     })
-    window.addEventListener('resize', console.log(store))
     const device = computed(() => store.getters.device)
     const app = getCurrentInstance()?.appContext.config.globalProperties
     const handleClick = (tab, event) => {

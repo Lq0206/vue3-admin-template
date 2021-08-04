@@ -4,23 +4,25 @@
  * @Author: Lqi
  * @Date: 2020-10-19 10:45:37
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-26 10:50:26
+ * @LastEditTime: 2021-08-02 10:55:01
 -->
 <template>
   <div style="padding: 0 12px">
     <el-dropdown
-trigger="click"
-                 @command="handleSetSize">
+      trigger="click"
+      @command="handleSetSize"
+    >
       <a>
         <i class="iconfont icon-font-size navbar-icon"></i>
       </a>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item
-v-for="item of sizeOptions"
-                            :key="item.value"
-                            :disabled="size===item.value"
-                            :command="item.value">
+            v-for="item of sizeOptions"
+            :key="item.value"
+            :disabled="size===item.value"
+            :command="item.value"
+          >
             {{ item.label }}
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -56,8 +58,8 @@ export default defineComponent({
       app.appContext.config.globalProperties.$ELEMENT.size = size
       store.dispatch('setSize', size)
       refreshView()
-      getCurrentInstance()?.appContext.config.globalProperties.$message({
-        message: 'Switch Size Success',
+      app.appContext.config.globalProperties.$message({
+        message: '配置成功',
         type: 'success'
       })
     }

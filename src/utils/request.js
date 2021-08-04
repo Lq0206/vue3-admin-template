@@ -4,10 +4,11 @@
  * @Author: Lqi
  * @Date: 2021-07-22 14:23:30
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-22 17:13:12
+ * @LastEditTime: 2021-08-04 15:14:56
  */
 import axios from 'axios'
 import store from '@/store'
+import { ElMessage } from 'element-plus'
 // import { getCurrentInstance } from 'vue'
 
 const service = axios.create({
@@ -17,8 +18,8 @@ const service = axios.create({
 
 const err = (error) => {
   if (error.response) {
-    const data = error.response.data
-    console.log('err', data)
+    // const data = error.response.data
+    console.log('err', error)
   }
   return Promise.reject(error)
 }
@@ -34,8 +35,12 @@ service.interceptors.request.use(config => {
 
 /* response */
 service.interceptors.response.use(response => {
-  if (!response.data.status) {
-    console.log('res', response)
+  if (!response.status && !response.data.status) {
+    ElMessage({
+      type: 'error',
+      message: response.data.message,
+      duration: 4000
+    })
   }
   return response.data
 }, err)

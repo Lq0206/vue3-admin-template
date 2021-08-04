@@ -12,7 +12,7 @@ const ORIGINAL_THEME = '#409EFF' // default color
 import { computed, defineComponent, reactive, toRefs, watch, getCurrentInstance } from 'vue'
 import { useStore } from 'vuex'
 export default defineComponent({
-  setup(props, cxt) {
+  setup(props, ctx) {
     const store = useStore()
     const state = reactive({
       chalk: '', // content of theme-chalk css
@@ -72,7 +72,7 @@ export default defineComponent({
         style.innerText = updateStyle(innerText, originalCluster, themeCluster)
       })
 
-      cxt.emit('change', val)
+      ctx.emit('change', val)
     })
 
     const updateStyle = (style, oldCluster, newCluster) => {
