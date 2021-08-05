@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-08-03 09:36:30
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-03 11:56:44
+ * @LastEditTime: 2021-08-05 16:53:41
 -->
 <template>
   <div
@@ -74,10 +74,6 @@ export default defineComponent({
         t[c.prop] = ''
         return t
       }, {}),
-      initForm: _.cloneDeep(inject('columns')).reduce((t, c) => {
-        t[c.prop] = ''
-        return t
-      }, {}),
       loading: false
     })
 
@@ -104,8 +100,9 @@ export default defineComponent({
       ctx.emit('search', state.form)
     }
 
-    const reset = (params) => {
-      state.form = _.cloneDeep(state.initForm)
+    const reset = () => {
+      Object.keys(state.form).forEach(key => (state.form[key] = ''))
+      ctx.emit('reset')
     }
 
     return {
@@ -116,7 +113,7 @@ export default defineComponent({
       reset
     }
   },
-  emits: ['search']
+  emits: ['search', 'reset']
 })
 
 </script>

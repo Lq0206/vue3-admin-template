@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-30 09:45:58
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-03 15:23:00
+ * @LastEditTime: 2021-08-05 11:17:47
 -->
 <template>
   <div class="page-wrapper">
@@ -18,9 +18,7 @@
               size="small"
             >
               <el-radio-button label="全部"></el-radio-button>
-              <el-radio-button
-                label="进行中"
-              ></el-radio-button>
+              <el-radio-button label="进行中"></el-radio-button>
               <el-radio-button label="等待中"></el-radio-button>
               <el-radio-button label="完成"></el-radio-button>
             </el-radio-group>
@@ -55,9 +53,12 @@
           prop="progress"
           label="进度"
         >
-        <template #default="scope">
-          <el-progress :percentage="scope.row.progress" :color="customColors"></el-progress>
-        </template>
+          <template #default="scope">
+            <el-progress
+              :percentage="scope.row.progress"
+              :color="customColors"
+            ></el-progress>
+          </template>
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -77,6 +78,13 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="1000"
+        style="margin-top: 16px"
+      >
+      </el-pagination>
     </el-card>
   </div>
 </template>

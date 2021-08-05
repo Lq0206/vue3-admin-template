@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-23 16:54:03
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-04 17:55:37
+ * @LastEditTime: 2021-08-05 15:31:12
 -->
 <template>
   <div class="app-main-wrap">
@@ -19,12 +19,22 @@
                 label-width="80px"
               >
                 <el-form-item
-                  label="昵称"
+                  label="用户名"
                   label-width="80px"
                 >
                   <el-input
-                    v-model="form.email"
+                    v-model="form.userName"
                     placeholder=""
+                    readonly
+                  ></el-input>
+                </el-form-item>
+                <el-form-item
+                  label="名字"
+                  label-width="80px"
+                >
+                  <el-input
+                    v-model="form.cname"
+                    placeholder="请填写名字"
                   ></el-input>
                 </el-form-item>
                 <el-form-item
@@ -32,8 +42,8 @@
                   label-width="80px"
                 >
                   <el-input
-                    v-model="form.nikename"
-                    placeholder=""
+                    v-model="form.email"
+                    placeholder="请填写邮箱"
                   ></el-input>
                 </el-form-item>
                 <el-form-item
@@ -46,40 +56,21 @@
                       minRows: 2,
                       maxRows: 4 }"
                     v-model="form.introduction"
-                    placeholder=""
+                    placeholder="请填写个人简介"
                   ></el-input>
-                </el-form-item>
-                <el-form-item
-                  label="地区"
-                  label-width="80px"
-                >
-                  <el-select
-                    v-model="form.country"
-                    placeholder=""
-                  >
-                    <el-option
-                      label="中国"
-                      value="china"
-                    >中国</el-option>
-                  </el-select>
                 </el-form-item>
                 <el-form-item
                   label="所在省市"
                   label-width="80px"
                 >
-                  <el-select
-                    v-model="form.city"
-                    placeholder=""
-                  ></el-select>
-                </el-form-item>
-                <el-form-item
-                  label="详细地址"
-                  label-width="80px"
-                >
-                  <el-select
-                    v-model="form.address"
-                    placeholder=""
-                  ></el-select>
+                  <el-cascader
+                    v-model="form.cities"
+                    :options="options"
+                    :props="{ label: 'name', value: 'code' }"
+                    placeholder="请选择"
+                    style="width: 100%"
+                    @change="areaChange"
+                  ></el-cascader>
                 </el-form-item>
                 <el-form-item
                   label="详细地址"
@@ -91,7 +82,7 @@
                       minRows: 2,
                       maxRows: 4 }"
                     v-model="form.address"
-                    placeholder=""
+                    placeholder="请填写详细地址"
                   ></el-input>
                 </el-form-item>
                 <el-form-item
@@ -102,12 +93,12 @@
                     <el-input
                       v-model="form.areaCode"
                       style="width: 100px"
-                      placeholder=""
+                      placeholder="+86/区号"
                     ></el-input>
                     <el-input
                       v-model="form.phone"
                       class="phone"
-                      placeholder=""
+                      placeholder="请填写联系电话"
                     ></el-input>
                   </el-space>
                 </el-form-item>
@@ -181,9 +172,11 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { defineComponent, reactive, toRefs, getCurrentInstance, computed } from 'vue'
+import { defineComponent, reactive, toRefs, getCurrentInstance, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import citysJson from '@/utils/json/full.json'
+import _ from 'lodash'
 export default defineComponent({
   name: 'Srtting',
   setup() {
@@ -193,12 +186,16 @@ export default defineComponent({
     const state = reactive({
       form: {
         email: '',
-        nikeName: '',
+        cname: '',
+        userName: '',
         introduction: '',
-        country: '',
-        city: '',
-        address: ''
+        cities: '',
+        address: '',
+        areaCode: '',
+        phone: ''
       },
+      avatar: '',
+      options: citysJson.data,
       activeName: route.query.key || '0',
       securityList: [
         { title: '账户密码', des: '当前密码强度：强', status: 1 },
@@ -213,6 +210,16 @@ export default defineComponent({
       router.replace({ query: { key: tab.index }})
     }
 
+    const initUserInfo = () => {
+      const userName = store.state.user.userInfo.roles[0]
+      Object.assign(state.form, _.cloneDeep(store.state.user.userInfo), { userName })
+      state.avatar = store.state.user.userInfo.avatar
+    }
+
+    onMounted(() => {
+      initUserInfo()
+    })
+
     const handleSetting = () => {
       app.$message({
         type: 'success',
@@ -220,7 +227,11 @@ export default defineComponent({
       })
     }
 
-    return { ...toRefs(state), handleSetting, handleClick, device }
+    const areaChange = (areaCode) => {
+      console.log(areaCode)
+    }
+
+    return { ...toRefs(state), handleSetting, handleClick, device, areaChange }
   }
 })
 

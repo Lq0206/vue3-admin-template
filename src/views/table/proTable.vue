@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-30 09:39:21
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-03 11:42:39
+ * @LastEditTime: 2021-08-05 17:27:37
 -->
 <template>
   <div class="page-wrapper">
@@ -12,12 +12,13 @@
       <ProTable
         :tableData="tableData"
         :columns="columns"
-        :reload="loadData"
+        :reload="reLoadData"
         :columns-config="{
           align: 'center'
         }"
         pagination
         @search="handleTableSearch"
+        @searchReset="searchReset"
       >
         <template #actions>
           <el-space>
@@ -39,37 +40,51 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { defineComponent, reactive, toRefs } from 'vue'
+import { defineComponent, onMounted, reactive, toRefs } from 'vue'
 import ProTable from '@/components/ProTable'
+import { initTableData } from '@/mock/mock'
+import { postReq } from '@/api'
 export default defineComponent({
   components: { ProTable },
   setup() {
     const state = reactive({
       tableData: [],
-      columns: [{ prop: 'id', width: '100px' }, { prop: 'date', alias: '日期', width: '150px' },
-        { prop: 'name', alias: '名称', width: '150px' }, { prop: 'address', alias: '地址' }]
+      columns: [
+        { prop: 'id', width: '100px' },
+        { prop: 'name', alias: '名称', width: '150px' },
+        { prop: 'date', alias: '日期', width: '150px' },
+        { prop: 'address', alias: '地址' }]
     })
 
-    const loadData = () => {
-      for (let i = 0; i < 20; i++) {
-        state.tableData.push({
-          id: `id_${i + 1}`,
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        })
-      }
+    onMounted(async() => {
+      state.tableData = await initTableData()
+      // loadData()
+    })
+
+    const searchReset = async() => {
+      state.tableData = await initTableData()
     }
-    loadData()
+
+    const loadData = async() => {
+      console.log('loadData')
+    }
+
+    const reLoadData = () => {
+      loadData()
+    }
 
     const handleTableSearch = (params) => {
-      console.log(params)
+      postReq('/pro-table/data', params).then(res => {
+        state.tableData = res.data
+      })
     }
 
     return {
       ...toRefs(state),
       loadData,
-      handleTableSearch
+      handleTableSearch,
+      reLoadData,
+      searchReset
     }
   }
 })

@@ -4,11 +4,11 @@
  * @Author: Lqi
  * @Date: 2021-07-30 10:02:45
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-03 11:52:44
+ * @LastEditTime: 2021-08-05 17:26:52
 -->
 <template>
   <div class="pro-table">
-    <SearchBar ref="SearchBarRef" @search="searchChange"></SearchBar>
+    <SearchBar ref="SearchBarRef" @search="searchChange" @reset="searchReset"></SearchBar>
     <div class="pro-table__content">
       <div class="pro-table__header clearfix">
         <h4 class="pro-table__header-title fl">{{ title }}</h4>
@@ -87,7 +87,7 @@
         <el-table
           ref="proTable"
           v-if="checkList.length > 0"
-          :data="tableDataColumns.slice((page.currentPage-1)*page.pageSize,page.currentPage*page.pageSize)"
+          :data="cloneTableData.slice((page.currentPage-1)*page.pageSize,page.currentPage*page.pageSize)"
           :size="curSize"
           row-key="id"
           v-loading="tableLoading"
@@ -137,9 +137,9 @@
             @current-change="handleCurrentChange"
             :page-sizes="[5, 10, 20]"
             :current-page="page.currentPage"
+            :total="cloneTableData.length"
             :page-size="page.pageSize"
             layout="total, sizes, prev, pager, next, jumper"
-            :total="tableDataColumns.length"
           >
           </el-pagination>
         </div>
@@ -163,7 +163,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { defineComponent, toRefs, reactive, nextTick, ref, provide } from 'vue'
+import { defineComponent, toRefs, reactive, nextTick, ref, provide, watch } from 'vue'
 import SearchBar from './components/searchBar.vue'
 import _ from 'lodash'
 export default defineComponent({
@@ -218,7 +218,7 @@ export default defineComponent({
         return v
       })),
       preSize: '',
-      tableDataColumns: _.cloneDeep(props.tableData),
+      cloneTableData: [],
       tableLoading: false,
       page: {
         currentPage: 1,
@@ -232,6 +232,18 @@ export default defineComponent({
     provide('columns', props.columns)
     provide('searchBar', props.searchBar)
 
+    watch(() => props.tableData, () => {
+      if (_.isEmpty(props.tableData[0])) return
+      /* 传入对象必须包含columns中的值 */
+      state.originalColumns.forEach(key => {
+        const tmp = Object.prototype.hasOwnProperty.call(props.tableData[0], key)
+        if (!tmp) {
+          throw new Error(`The object table-data-item must contain the key of the column`)
+        }
+      })
+      state.cloneTableData = _.cloneDeep(props.tableData)
+    })
+
     /* 重载数据 */
 
     const reLoadData = () => {
@@ -241,7 +253,7 @@ export default defineComponent({
       setTimeout(() => {
         state.tableLoading = false
         SearchBarRef.value.loading = false
-      }, 1000)
+      }, 400)
     }
 
     /* 单项checkBox 改变事件 */
@@ -339,8 +351,15 @@ export default defineComponent({
       console.log('ids', ids.join(','))
     }
 
+    /* searchBar sea */
+
     const searchChange = (params) => {
       ctx.emit('search', params)
+    }
+
+    /* searchBar reset */
+    const searchReset = () => {
+      ctx.emit('searchReset')
     }
 
     return {
@@ -357,10 +376,11 @@ export default defineComponent({
       handleCurrentChange,
       handleSelectionChange,
       multipleDelete,
-      searchChange
+      searchChange,
+      searchReset
     }
   },
-  emits: ['search']
+  emits: ['search', 'searchReset']
 })
 
 </script>
@@ -389,6 +409,9 @@ export default defineComponent({
     background: #fff;
     box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.08),
       0 9px 28px 0 rgba(0, 0, 0, 0.05), 0 12px 48px 16px rgba(0, 0, 0, 0.03);
+  }
+  &__pagination {
+    margin-top: 20px;
   }
 }
 
