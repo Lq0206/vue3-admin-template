@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-04-01 09:54:12
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-04 17:54:05
+ * @LastEditTime: 2021-08-16 11:20:00
  */
 import router from './router'
 import store from './store'
@@ -13,13 +13,17 @@ import { ElMessage } from 'element-plus'
 import getPageTitle from '@/utils/get-page-title'
 import { TOKEN } from './store/mutation-types'
 import { whiteList } from '@/router/routeList'
+import ls from '@/utils/local-ls'
 
 NProgress.configure({ showSpinner: false })
 
 router.beforeEach(async(to, from, next) => {
   NProgress.start()
   document.title = getPageTitle(to.meta.title)
-  const hasToken = localStorage.getItem(TOKEN)
+  const hasToken = ls.get(TOKEN)
+  if (hasToken) {
+    console.log(typeof hasToken)
+  }
   if (hasToken) {
     if (to.path === '/login') {
       next({ path: '/' })

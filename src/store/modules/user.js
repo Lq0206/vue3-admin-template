@@ -4,12 +4,13 @@
  * @Author: Lqi
  * @Date: 2021-04-07 10:43:46
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-04 18:09:59
+ * @LastEditTime: 2021-08-16 11:25:39
  */
 // import { createStore } from 'vuex'
 import { TOKEN } from '@/store/mutation-types'
 import { postReq } from '@/api'
 import router, { resetRouter } from '@/router'
+import ls from '@/utils/local-ls'
 // import { useStore } from '@/store'
 
 const user = {
@@ -21,7 +22,7 @@ const user = {
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
-      localStorage.setItem(TOKEN, token)
+      ls.set(TOKEN, token)
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
@@ -43,7 +44,7 @@ const user = {
     LoginOut({ commit }) {
       return new Promise((resolve, reject) => {
         commit(`SET_${TOKEN}`, '')
-        localStorage.setItem(TOKEN, '')
+        ls.set(TOKEN, '')
         resetRouter()
         resolve()
       })
@@ -61,7 +62,7 @@ const user = {
       /* token */
       const token = role + '-token'
       commit('SET_TOKEN', token)
-      localStorage.setItem(TOKEN, token)
+      ls.set(TOKEN, token)
       resetRouter()
       /* roles */
       const { roles } = await dispatch('GetInfo')
@@ -75,7 +76,7 @@ const user = {
       return new Promise((resolve) => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
-        localStorage.removeItem('token')
+        ls.remove('token')
         resolve()
       })
     }

@@ -4,33 +4,34 @@
  * @Author: Lqi
  * @Date: 2020-10-16 18:08:37
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-22 16:56:39
+ * @LastEditTime: 2021-08-16 11:19:07
  */
 // import Cookies from 'js-cookie'
+import ls from '@/utils/local-ls'
 
 const app = {
   state: {
     sidebar: {
-      opened: localStorage.getItem('sidebarStatus')
-        ? !!+localStorage.getItem('sidebarStatus')
+      opened: ls.get('sidebarStatus')
+        ? !!+ls.get('sidebarStatus')
         : true,
       withoutAnimation: false
     },
     device: 'desktop',
-    size: localStorage.getItem('size') || 'medium'
+    size: ls.get('size') || 'medium'
   },
   mutations: {
     TOGGLE_SIDEBAR: (state) => {
       state.sidebar.opened = !state.sidebar.opened
       state.sidebar.withoutAnimation = false
       if (state.sidebar.opened) {
-        localStorage.setItem('sidebarStatus', 1)
+        ls.set('sidebarStatus', 1)
       } else {
-        localStorage.setItem('sidebarStatus', 0)
+        ls.set('sidebarStatus', 0)
       }
     },
     CLOSE_SIDEBAR: (state, withoutAnimation) => {
-      localStorage.setItem('sidebarStatus', 0)
+      ls.set('sidebarStatus', 0)
       state.sidebar.opened = false
       state.sidebar.withoutAnimation = withoutAnimation
     },
@@ -39,7 +40,7 @@ const app = {
     },
     SET_SIZE: (state, size) => {
       state.size = size
-      localStorage.setItem('size', size)
+      ls.set('size', size)
     }
   },
   actions: {

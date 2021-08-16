@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-04-01 09:30:48
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-04 17:54:51
+ * @LastEditTime: 2021-08-16 11:33:21
  */
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Login from '@/views/login'
@@ -126,6 +126,7 @@ export const routes = [
       {
         path: '/details',
         component: () => import('@/views/details/index'),
+        name: 'details',
         meta: { title: '详情页', icon: '', roles: ['admin', 'visitor'] }
       }
       // {
@@ -147,11 +148,13 @@ export const routes = [
       {
         path: '/success',
         component: () => import('@/views/result/success'),
+        name: 'success',
         meta: { title: '成功页', icon: '', roles: ['admin', 'visitor'] }
       },
       {
         path: '/failed',
         component: () => import('@/views/result/failed'),
+        name: 'failed',
         meta: { title: '失败页', icon: '', roles: ['admin', 'visitor'] }
       }
     ]
