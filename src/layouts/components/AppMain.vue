@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2020-10-19 09:49:14
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-02 10:33:58
+ * @LastEditTime: 2021-08-16 14:49:24
 -->
 
 <template>
@@ -41,7 +41,7 @@ export default defineComponent({
   position: relative;
   overflow: hidden;
   padding: 20px;
-  background: #fafafa;
+  background: #f0f2f5;
 }
 
 .fixed-header + .app-main {

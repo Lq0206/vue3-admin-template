@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-30 10:02:45
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-05 17:26:52
+ * @LastEditTime: 2021-08-17 14:41:52
 -->
 <template>
   <div class="pro-table">
@@ -118,10 +118,12 @@
             label="操作"
             :size="curSize"
           >
+          <template #default="scope">
             <div class="pro-table__actions">
-              <slot name="actions">
+              <slot name="actions" :props="JSON.parse(JSON.stringify(scope.row))">
               </slot>
             </div>
+          </template>
           </el-table-column>
         </el-table>
         <div

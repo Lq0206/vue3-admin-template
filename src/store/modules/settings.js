@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2020-10-19 11:33:30
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-16 11:22:01
+ * @LastEditTime: 2021-08-16 14:21:45
  */
 import variables from '@/styles/element-variables.scss'
 import defaultSettings from '@/settings'
@@ -17,7 +17,8 @@ const state = {
   showSettings: showSettings,
   tagsView: tagsView,
   fixedHeader: fixedHeader,
-  sidebarLogo: sidebarLogo
+  sidebarLogo: sidebarLogo,
+  darkMode: false
 }
 
 const mutations = {

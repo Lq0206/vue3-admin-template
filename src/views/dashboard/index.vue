@@ -4,117 +4,11 @@
  * @Author: Lqi
  * @Date: 2021-04-07 09:51:19
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-02 09:27:42
+ * @LastEditTime: 2021-08-17 11:14:09
 -->
 <template>
   <div class="app-main-wrap">
-    <el-row :gutter="24">
-      <el-col
-        :span="6"
-        :xs="12"
-      >
-        <CusCard customClass="green-gradient">
-          <template #header>
-            <div class="header">
-              <span>店铺数据</span>
-              <a class="ops">
-                <i class="el-icon-more"></i>
-              </a>
-            </div>
-          </template>
-          <div class="body">
-            <i class="el-icon-eleme card-icon hidden-md-and-down"></i>
-            <div class="money">
-              <div>
-                <span class="CNY">￥</span><span class="num">7,985,255</span>
-              </div>
-              <div class="order">共 26954 笔订单</div>
-            </div>
-          </div>
-        </CusCard>
-      </el-col>
-      <el-col
-        :span="6"
-        :xs="12"
-      >
-        <CusCard customClass="red-gradient">
-          <template #header>
-            <div class="header">
-              <span>店铺数据</span>
-              <a class="ops">
-                <i class="el-icon-more"></i>
-              </a>
-            </div>
-            <div class="body">
-              <i class="el-icon-star-on card-icon hidden-md-and-down"></i>
-              <div class="money">
-                <div>
-                  <span class="CNY">￥</span><span class="num">85,298</span>
-                </div>
-                <div class="order">共 3546 笔订单</div>
-              </div>
-            </div>
-          </template>
-        </CusCard>
-      </el-col>
-      <el-col
-        :span="6"
-        :xs="12"
-      >
-        <CusCard customClass="orange-gradient">
-          <template #header>
-            <div class="header">
-              <span>销售总额</span>
-              <a class="ops">
-                <i class="el-icon-more"></i>
-              </a>
-            </div>
-          </template>
-          <div class="body">
-            <div class="flex-column">
-              <div class="money">
-                <span class="CNY">￥</span>
-                <span class="num">7,229,822</span>
-              </div>
-              <div class="up-and-down">
-                <i class="el-icon-top-right"></i>
-                <span>2.63%</span>
-              </div>
-            </div>
-          </div>
-        </CusCard>
-      </el-col>
-      <el-col
-        :span="6"
-        :xs="12"
-      >
-        <CusCard customClass="blue-gradient">
-          <template #header>
-            <div class="header">
-              <span>昨日新增用户</span>
-              <a class="ops">
-                <i class="el-icon-more"></i>
-              </a>
-            </div>
-          </template>
-          <div class="body">
-            <div class="flex-column">
-              <div class="money">
-                <span class="num">14,822</span>
-              </div>
-              <div class="up-and-down">
-                <i class="el-icon-top-right"></i>
-                <span>2.63%</span>
-              </div>
-            </div>
-            <div
-              id="users"
-              class="chart-wrap hidden-md-and-down"
-            ></div>
-          </div>
-        </CusCard>
-      </el-col>
-    </el-row>
+    <TopLayout></TopLayout>
     <el-row :gutter="20">
       <el-col
         :span="18"
@@ -194,56 +88,31 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { defineComponent, onMounted, onBeforeUnmount } from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount, watch } from 'vue'
 import CusCard from '@/components/CusCard'
 import * as echarts from 'echarts'
+import { useStore } from 'vuex'
+import TopLayout from './components/top.vue'
 export default defineComponent({
   name: 'Dashboard',
-  components: { CusCard },
+  components: { CusCard, TopLayout },
   setup() {
     let pvuvChart = null
-    let userChart = null
+    const store = useStore()
     onMounted(() => {
-      initUsers()
       initPVUV()
       window.addEventListener('resize', () => {
         pvuvChart.resize()
-        userChart.resize()
       })
     })
 
     onBeforeUnmount(() => {
       window.removeEventListener('resize', pvuvChart.resize())
-      window.removeEventListener('resize', userChart.resize())
     })
 
-    const initUsers = () => {
-      userChart = echarts.init(document.getElementById('users'))
-      userChart.setOption({
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-          type: 'value'
-        },
-        grid: {
-          x: 50,
-          x2: 20
-        },
-        legend: {
-          textStyle: {
-            color: '#fff'
-          }
-        },
-        series: [{
-          data: [820, 932, 901, 934, 1290, 1330, 1320],
-          type: 'line',
-          areaStyle: {}
-        }]
-      })
-    }
+    watch(() => store.getters.sidebar.opened, () => {
+      pvuvChart.resize()
+    })
 
     const initPVUV = () => {
       pvuvChart = echarts.init(document.getElementById('pvuv'))
@@ -291,7 +160,7 @@ export default defineComponent({
       })
     }
 
-    return { initUsers }
+    return { }
   }
 })
 
@@ -303,14 +172,18 @@ export default defineComponent({
   > .header {
     display: flex;
     justify-content: space-between;
-    color: #fff;
     margin-bottom: 10px;
+    span {
+      font-size: 14px;
+      line-height: 22px;
+      height: 22px;
+      color: rgba(0, 0, 0, 0.45);
+    }
   }
   > .body {
-    display: flex;
-    justify-content: space-between;
-    color: #fff;
-    padding: 10px;
+    // display: flex;
+    // justify-content: space-between;
+    // padding: 10px;
     .flex-column {
       display: flex;
       flex-direction: column;
@@ -322,20 +195,32 @@ export default defineComponent({
       display: block;
       white-space: nowrap;
       width: 100%;
+      margin-bottom: 30px;
     }
     .money {
+      z-index: 1;
+      color: rgba(0, 0, 0, 0.85);
       .CNY {
         bottom: 0;
       }
       .num {
-        font-size: 40px;
+        font-size: 30px;
+        height: 38px;
+        line-height: 38px;
         white-space: nowrap;
         transition: all 0.28s ease;
       }
     }
     .order {
-      text-align: right;
-      white-space: nowrap;
+      height: 26px;
+      span {
+        font-size: 14px;
+        height: 22px;
+        line-height: 22px;
+        color: rgba(0, 0, 0, 0.85);
+        white-space: nowrap;
+      }
+      // margin: 20px 0 30px;
     }
   }
   > .ops {
@@ -358,6 +243,10 @@ export default defineComponent({
       }
     }
   }
+
+}
+.box-padding {
+  padding-bottom: 0;
 }
 .red-gradient {
   background: linear-gradient(#ffab91, #ff7043) !important;
@@ -372,7 +261,13 @@ export default defineComponent({
   background: linear-gradient(#ffcc80, #ffa726) !important;
 }
 .chart-wrap {
-  width: 200px;
+  // position: absolute;
+  // left: 0;
+  // right: 0;
+  // bottom: 0;
+  width: 100%;
+  height: 70px;
+  z-index: 0;
 }
 
 @media screen and (max-width: 992px) {
@@ -385,10 +280,6 @@ export default defineComponent({
         .num {
           font-size: 30px;
         }
-      }
-      .order,
-      .up-and-down {
-        text-align: center;
       }
     }
   }

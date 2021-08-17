@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-23 14:41:28
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-28 16:55:24
+ * @LastEditTime: 2021-08-16 15:13:54
 -->
 <template>
   <div :class="['custom-card', customClass]">
@@ -40,8 +40,11 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .custom-card {
+  position: relative;
   background: #fff;
   margin-bottom: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
   &:hover {
     box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
     transition: all 0.28s linear;

@@ -34,6 +34,13 @@
           class="drawer-switch"
         />
       </div>
+      <!-- <div class="drawer-item">
+        <span>黑暗模式</span>
+        <el-switch
+          v-model="darkMode"
+          class="drawer-switch"
+        />
+      </div> -->
 
     </div>
   </div>
@@ -83,12 +90,32 @@ export default defineComponent({
       }
     })
 
+    // const darkMode = computed({
+    //   get() {
+    //     return store.state.settings.darkMode
+    //   },
+    //   set(val) {
+    //     store.dispatch('settings/changeSetting', {
+    //       key: 'darkMode',
+    //       value: val
+    //     })
+    //   }
+    // })
+
     const themeChange = (val) => {
       store.dispatch('settings/changeSetting', {
         key: 'theme',
         value: val
       })
     }
+
+    // watch(() => darkMode.value, () => {
+    //   if (darkMode.value) {
+    //     window.document.documentElement.setAttribute('data-theme', 'dark')
+    //   } else {
+    //     window.document.documentElement.setAttribute('data-theme', 'light')
+    //   }
+    // })
 
     return {
       fixedHeader,
