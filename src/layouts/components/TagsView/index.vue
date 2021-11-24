@@ -8,7 +8,7 @@
       class="tags-view-wrapper"
       @scroll="handleScroll"
     >
-    <router-link
+      <router-link
         v-for="(tag, i) in visitedViews"
         :ref="el => tagList[i]=el"
         :key="tag.path"
@@ -22,7 +22,7 @@
         {{ tag.title }}
         <span
           v-if="!isAffix(tag)"
-          class="el-icon-close"
+          class="el-icon-close tag-icon"
           @click.prevent.stop="closeSelectedTag(tag)"
         />
       </router-link>
@@ -279,19 +279,19 @@ export default defineComponent({
         margin-right: 15px;
       }
       &.active {
-        background-color: #1890FF;
+        background-color: #1890ff;
         color: #fff;
-        border-color: #1890FF;
-        &::before {
-          content: "";
-          background: #fff;
-          display: inline-block;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          position: relative;
-          margin-right: 2px;
-        }
+        border-color: #1890ff;
+        // &::before {
+        //   content: "";
+        //   background: #fff;
+        //   display: inline-block;
+        //   width: 8px;
+        //   height: 8px;
+        //   border-radius: 50%;
+        //   position: relative;
+        //   margin-right: 2px;
+        // }
       }
     }
   }
@@ -324,9 +324,8 @@ export default defineComponent({
 .tags-view-wrapper {
   .tags-view-item {
     .el-icon-close {
-      width: 16px;
+      width: 0;
       height: 16px;
-      vertical-align: 2px;
       border-radius: 50%;
       text-align: center;
       transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -334,11 +333,26 @@ export default defineComponent({
       &:before {
         transform: scale(0.6);
         display: inline-block;
-        vertical-align: -3px;
+        // vertical-align: middle;
       }
       &:hover {
-        background-color: #b4bccc;
-        color: #fff;
+        background-color: #d9d9d9;
+        color: #000;
+      }
+    }
+    &.active .el-icon-close:hover {
+      background-color: #fff;
+      color: #1890ff;
+    }
+    .tag-icon {
+      font-size: 0;
+    }
+    &:hover {
+      .el-icon-close {
+        width: 16px;
+      }
+      .tag-icon {
+        font-size: 16px;
       }
     }
   }

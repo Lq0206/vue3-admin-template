@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-04-01 09:30:48
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-16 11:33:21
+ * @LastEditTime: 2021-11-04 10:20:34
  */
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Login from '@/views/login'
@@ -13,6 +13,7 @@ import Layout from '@/layouts'
 
 export const routes = [
   {
+    path: '/redirect',
     component: Layout,
     hidden: true,
     children: [

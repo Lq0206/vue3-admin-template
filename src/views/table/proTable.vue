@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-07-30 09:39:21
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-17 16:01:34
+ * @LastEditTime: 2021-08-23 11:02:20
 -->
 <template>
   <div class="page-wrapper">
@@ -54,16 +54,16 @@
     >
       <div class="form-content">
         <el-form ref="form" :model="form" label-width="40px">
-          <el-form-item v-if="drawerIsEdit" label="id" label-width="40px">
-            <el-input v-model="form.name" readonly></el-input>
+          <el-form-item v-if="drawerIsEdit" label="id" prop="id">
+            <el-input v-model="form.id" readonly></el-input>
           </el-form-item>
-          <el-form-item label="名称">
+          <el-form-item label="名称" prop="name">
             <el-input v-model="form.name" placeholder="请填写名称"></el-input>
           </el-form-item>
-          <el-form-item label="日期">
+          <el-form-item label="日期" prop="date">
             <el-input v-model="form.date" placeholder="请选择日期"></el-input>
           </el-form-item>
-          <el-form-item label="地址">
+          <el-form-item label="地址" prop="address">
             <el-input v-model="form.address" placeholder="请填写地址"></el-input>
           </el-form-item>
         </el-form>
@@ -92,10 +92,10 @@ export default defineComponent({
       drawer: false,
       drawerIsEdit: false,
       form: {
-        id: '',
-        name: '',
-        date: '',
-        address: ''
+        id: '1',
+        name: '2',
+        date: '2',
+        address: '3'
       }
     })
     const app = getCurrentInstance().appContext.config.globalProperties
@@ -128,7 +128,7 @@ export default defineComponent({
       state.drawerIsEdit = true
       console.log(props)
       nextTick(() => {
-        state.form = Object.assign({}, props)
+        // state.form = Object.assign({}, props)
         console.log(state.form)
       })
     }

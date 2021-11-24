@@ -4,7 +4,7 @@
  * @Author: Lqi
  * @Date: 2021-04-01 09:54:12
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-16 11:20:00
+ * @LastEditTime: 2021-11-02 15:45:56
  */
 import router from './router'
 import store from './store'
@@ -37,7 +37,7 @@ router.beforeEach(async(to, from, next) => {
         try {
           const { roles } = await store.dispatch('GetInfo')
           const accessRoutes = await store.dispatch('generateRoutes', roles)
-          /* vue-router 4 不只支持数组添加 */
+          /* vue-router 4 不支持数组添加 */
           if (accessRoutes.length > 0) {
             router.addRoute(...accessRoutes)
             next({ ...to, replace: true })
